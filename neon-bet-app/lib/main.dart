@@ -1,183 +1,96 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const NeonBetApp());
-}
+void main() => runApp(const NeonBetApp());
 
 class NeonBetApp extends StatelessWidget {
   const NeonBetApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'NEON BET',
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        scaffoldBackgroundColor: const Color(0xFF070A12),
-      ),
-      home: const NeonBetHome(),
+      theme: ThemeData.dark(useMaterial3: true),
+      home: const HomePage(),
     );
   }
 }
 
-class NeonBetHome extends StatefulWidget {
-  const NeonBetHome({super.key});
-
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
   @override
-  State<NeonBetHome> createState() => _NeonBetHomeState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _NeonBetHomeState extends State<NeonBetHome> {
-  static const _appUrl =
-      'https://9misha0-sketch.github.io/neon-world/?app=android-v3';
-
-  late final WebViewController _controller;
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFF070A12))
-      ..enableZoom(false)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (_) {
-            if (!mounted) return;
-            setState(() {
-              _loading = true;
-              _error = null;
-            });
-          },
-          onPageFinished: (_) async {
-            await _controller.runJavaScript('''
-              document.documentElement.style.visibility='visible';
-              document.documentElement.style.opacity='1';
-              document.body.style.visibility='visible';
-              document.body.style.opacity='1';
-              document.body.style.display='block';
-              window.scrollTo(0,0);
-            ''');
-            if (!mounted) return;
-            setState(() => _loading = false);
-          },
-          onWebResourceError: (error) {
-            if (error.isForMainFrame == false) return;
-            if (!mounted) return;
-            setState(() {
-              _loading = false;
-              _error = 'לא הצלחנו לטעון את NEON BET. בדוק חיבור לאינטרנט ולחץ נסה שוב.';
-            });
-          },
-        ),
-      );
-
-    unawaited(_loadFresh());
-  }
-
-  Future<void> _loadFresh() async {
-    try {
-      await _controller.clearCache();
-      await _controller.loadRequest(
-        Uri.parse('$_appUrl&t=${DateTime.now().millisecondsSinceEpoch}'),
-        headers: const {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-        },
-      );
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = 'אירעה שגיאה בפתיחת האפליקציה. לחץ נסה שוב.';
-      });
-    }
-  }
-
-  Future<bool> _handleBack() async {
-    if (await _controller.canGoBack()) {
-      await _controller.goBack();
-      return false;
-    }
-    return true;
-  }
-
+class _HomePageState extends State<HomePage> {
+  int index = 0;
+  final pages = const [HomeContent(), GamesPage(), BonusPage(), ProfilePage()];
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        if (await _handleBack() && mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: Scaffold(
-        body: SafeArea(
-          bottom: false,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              WebViewWidget(controller: _controller),
-              if (_loading)
-                const ColoredBox(
-                  color: Color(0xFF070A12),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'NEON BET',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 18),
-                        CircularProgressIndicator(),
-                      ],
-                    ),
-                  ),
-                ),
-              if (_error != null)
-                ColoredBox(
-                  color: const Color(0xFF070A12),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.wifi_off_rounded, size: 54),
-                          const SizedBox(height: 16),
-                          Text(
-                            _error!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 17, height: 1.5),
-                          ),
-                          const SizedBox(height: 20),
-                          FilledButton.icon(
-                            onPressed: _loadFresh,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('נסה שוב'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF050817),
+      body: SafeArea(child: pages[index]),
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: const Color(0xFF0B1020),
+        indicatorColor: const Color(0xFF6C4CFF),
+        selectedIndex: index,
+        onDestinationSelected: (v) => setState(() => index = v),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'בית'),
+          NavigationDestination(icon: Icon(Icons.casino_outlined), selectedIcon: Icon(Icons.casino), label: 'משחקים'),
+          NavigationDestination(icon: Icon(Icons.card_giftcard), label: 'בונוס'),
+          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'פרופיל'),
+        ],
+      ),
+    );
+  }
+}
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF27155E), Color(0xFF07384B), Color(0xFF050817)], stops: [0, .42, .78]),
+      ),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 30),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text('NEON BET', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11), decoration: BoxDecoration(color: const Color(0xFF11182A), borderRadius: BorderRadius.circular(18)), child: const Text('25,000 🪙', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+            ]),
+            const SizedBox(height: 65),
+            const Text('SOCIAL CASINO • PLAY MONEY ONLY', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF24D9E7), fontWeight: FontWeight.w800, letterSpacing: 1.4)),
+            const SizedBox(height: 18),
+            const Text('הדור הבא של\nמשחקי הקזינו', textAlign: TextAlign.center, style: TextStyle(fontSize: 46, height: 1.12, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 20),
+            const Text('חוויה מהירה עם מטבעות וירטואליים בלבד.\nללא הפקדות, ללא משיכות וללא הימורים בכסף אמיתי.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFB7BED0), fontSize: 17, height: 1.55)),
+            const SizedBox(height: 28),
+            FilledButton(onPressed: () {}, style: FilledButton.styleFrom(backgroundColor: const Color(0xFF6C4CFF), padding: const EdgeInsets.all(18)), child: const Text('שחק עכשיו', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold))),
+            const SizedBox(height: 16),
+            OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(17)), child: const Text('🎁 בונוס יומי', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+            const SizedBox(height: 28),
+            Card(color: const Color(0xFF10182A), child: Padding(padding: const EdgeInsets.all(28), child: Column(children: const [Text('NEON JACKPOT', style: TextStyle(color: Color(0xFFFFD66B), fontWeight: FontWeight.bold, fontSize: 18)), SizedBox(height: 15), Text('8,472,221', style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900)), SizedBox(height: 8), Text('מטבעות וירטואליים', style: TextStyle(color: Color(0xFFB7BED0), fontSize: 16))]))),
+          ]),
         ),
       ),
     );
   }
+}
+
+class GamesPage extends StatelessWidget {
+  const GamesPage({super.key});
+  @override Widget build(BuildContext context) => const Center(child: Text('🎰 משחקים', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)));
+}
+class BonusPage extends StatelessWidget {
+  const BonusPage({super.key});
+  @override Widget build(BuildContext context) => const Center(child: Text('🎁 בונוס יומי', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)));
+}
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+  @override Widget build(BuildContext context) => const Center(child: Text('👤 פרופיל', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)));
 }
