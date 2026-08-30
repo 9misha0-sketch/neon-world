@@ -20,16 +20,17 @@ jobs:
           mkdir extracted
           unzip -o "NEON_WORLD_v0.5_FIXED.zip" -d extracted
           echo "ZIP extracted"
-          find extracted -maxdepth 3 -type f | head -50
 
       - name: Find Flutter project
         run: |
           PROJECT_DIR=$(find extracted -name pubspec.yaml -printf '%h\n' | head -1)
+
           if [ -z "$PROJECT_DIR" ]; then
             echo "Flutter project not found"
             exit 1
           fi
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
           echo "Flutter project found at: $PROJECT_DIR"
 
       - name: Setup Java
@@ -46,18 +47,38 @@ jobs:
 
       - name: Create Android project files
         working-directory: ${{ env.PROJECT_DIR }}
-        run: |
-          flutter create --platforms=android --org com.neonworld .
+        run: flutter create --platforms=android --org com.neonworld .
 
       - name: Add Android permissions
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
+          python3 -c 'from pathlib import Path; p=Path("android/app/src/main/AndroidManifest.xml"); s=p.read_text(); perms="<uses-permission android:name=\"android.permission.INTERNET\"/>\n<uses-permission android:name=\"android.permission.CAMERA\"/>\n<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>\n<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>\n<uses-permission android:name=\"android.permission.BLUETOOTH\"/>\n<uses-permission android:name=\"android.permission.BLUETOOTH_CONNECT\"/>\n"; s=s if "android.permission.CAMERA" in s else s.replace("<application", perms+"<application",1); p.write_text(s)'
+          echo "Android permissions added"
 
-          p = Path("android/app/src/main/AndroidManifest.xml")
-          s = p.read_text()
+      - name: Install dependencies
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          flutter clean
+          flutter pub get
 
-          permissions = '''<uses-permission android:name="android.permission.INTERNET"/>
-          <uses-permission android:name="android.permission.CAMERA"/>
-          <uses
+      - name: Analyze
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Build APK
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: flutter build apk --release
+
+      - name: Verify APK
+        run: |
+          APK_PATH="${PROJECT_DIR}/build/app/outputs/flutter-apk/app-release.apk"
+          test -f "$APK_PATH"
+          ls -lh "$APK_PATH"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEON-WORLD-Android
+          path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
