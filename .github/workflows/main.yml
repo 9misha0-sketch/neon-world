@@ -18,7 +18,7 @@ jobs:
         run: |
           rm -rf extracted
           mkdir extracted
-          unzip -o "NEON_WORLD_v0.5_FIXED.zip" -d extracted
+          unzip -o unzip -o "NEON_WORLD_v0.5_FIXED2.zip" -d extracted -d extracted
 
       - name: Find Flutter project
         id: project
