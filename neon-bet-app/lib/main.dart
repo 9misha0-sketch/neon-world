@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const checkoutUrl = String.fromEnvironment('CHECKOUT_URL', defaultValue: '');
 
 void main() => runApp(const NeonBetApp());
 
@@ -10,7 +13,85 @@ class NeonBetApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'NEON BET',
       theme: ThemeData.dark(useMaterial3: true),
-      home: const HomePage(),
+      home: const MembershipGate(),
+    );
+  }
+}
+
+class MembershipGate extends StatefulWidget {
+  const MembershipGate({super.key});
+  @override
+  State<MembershipGate> createState() => _MembershipGateState();
+}
+
+class _MembershipGateState extends State<MembershipGate> {
+  bool active = false;
+
+  Future<void> _subscribe() async {
+    if (checkoutUrl.isEmpty) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (_) => const AlertDialog(
+          title: Text('הסליקה עדיין לא מחוברת'),
+          content: Text('מסך המנוי מוכן. כדי לחייב 30₪ בחודש צריך לחבר חשבון סליקה וכתובת Checkout מאובטחת.'),
+        ),
+      );
+      return;
+    }
+    final uri = Uri.parse(checkoutUrl);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (active) return const HomePage();
+    return Scaffold(
+      backgroundColor: const Color(0xFF050817),
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2A155F), Color(0xFF07394C), Color(0xFF050817)],
+          ),
+        ),
+        child: SafeArea(
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Icon(Icons.workspace_premium, size: 78, color: Color(0xFFFFD166)),
+                  const SizedBox(height: 20),
+                  const Text('NEON BET CLUB', textAlign: TextAlign.center, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 12),
+                  const Text('מנוי חודשי', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, color: Color(0xFF6EE7F5), fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
+                  const Text('30₪ / חודש', textAlign: TextAlign.center, style: TextStyle(fontSize: 42, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 22),
+                  const Text('המנוי מעניק גישה לאפליקציה ולמשחקי Play Money בלבד. אין הפקדות, משיכות או זכיות בכסף אמיתי.', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, height: 1.5, color: Color(0xFFBCC5D8))),
+                  const SizedBox(height: 28),
+                  FilledButton(
+                    onPressed: _subscribe,
+                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF6C4CFF), padding: const EdgeInsets.all(18)),
+                    child: const Text('הצטרף ב־30₪ לחודש', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: () => setState(() => active = true),
+                    child: const Text('מצב בדיקה למפתח'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
