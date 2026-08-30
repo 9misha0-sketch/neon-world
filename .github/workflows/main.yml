@@ -1,42 +1,90 @@
-import 'package:livekit_client/livekit_client.dart';
+name: Build NEON WORLD APK
 
-class LiveKitService {
-  Room? room;
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-  Future<Room> connect({
-    required String url,
-    required String token,
-  }) async {
-    await disconnect();
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    final r = Room();
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    await r.connect(url, token);
+      - name: Extract NEON WORLD
+        run: |
+          rm -rf app
+          mkdir app
+          unzip -o NEON_WORLD_v0.5_connected.zip -d app
+          test -f app/world_live_chat_mvp/pubspec.yaml
 
-    await r.localParticipant?.setCameraEnabled(true);
-    await r.localParticipant?.setMicrophoneEnabled(true);
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
-    room = r;
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-    return r;
-  }
+      - name: Fix LiveKit null safety
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
 
-  Future<void> setMicEnabled(bool enabled) async {
-    await room?.localParticipant?.setMicrophoneEnabled(enabled);
-  }
+          p = Path("app/world_live_chat_mvp/lib/services/livekit_service.dart")
+          s = p.read_text()
 
-  Future<void> setCameraEnabled(bool enabled) async {
-    await room?.localParticipant?.setCameraEnabled(enabled);
-  }
+          s = s.replace(
+              "r.localParticipant.setCameraEnabled(",
+              "r.localParticipant?.setCameraEnabled("
+          )
+          s = s.replace(
+              "r.localParticipant.setMicrophoneEnabled(",
+              "r.localParticipant?.setMicrophoneEnabled("
+          )
+          s = s.replace(
+              "room?.localParticipant.setCameraEnabled(",
+              "room?.localParticipant?.setCameraEnabled("
+          )
+          s = s.replace(
+              "room?.localParticipant.setMicrophoneEnabled(",
+              "room?.localParticipant?.setMicrophoneEnabled("
+          )
 
-  Future<void> disconnect() async {
-    final r = room;
+          p.write_text(s)
+          print(p.read_text())
+          PY
 
-    room = null;
+      - name: Create Android platform
+        working-directory: app/world_live_chat_mvp
+        run: |
+          if [ ! -d android ]; then
+            flutter create --platforms=android --org com.neonworld .
+          fi
 
-    if (r != null) {
-      await r.disconnect();
-      await r.dispose();
-    }
-  }
-}
+      - name: Install dependencies
+        working-directory: app/world_live_chat_mvp
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: app/world_live_chat_mvp
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Build APK
+        working-directory: app/world_live_chat_mvp
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEON-WORLD-Android-Fixed
+          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
