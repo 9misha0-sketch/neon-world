@@ -1,7 +1,7 @@
 name: neon_bet_app
-description: NEON BET Android app wrapper
+description: NEON BET native Android social casino demo
 publish_to: 'none'
-version: 2.0.1+3
+version: 3.0.0+4
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:
