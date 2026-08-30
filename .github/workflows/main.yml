@@ -1,1 +1,54 @@
+name: Build NEON WORLD APK
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract NEON WORLD
+        run: |
+          mkdir app
+          unzip NEON_WORLD_v0.5_connected.zip -d app
+          echo "Project contents:"
+          find app -maxdepth 3 -type f | head -100
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Create Android platform
+        working-directory: app/world_live_chat_mvp
+        run: |
+          if [ ! -d "android" ]; then
+            flutter create --platforms=android .
+          fi
+
+      - name: Install dependencies
+        working-directory: app/world_live_chat_mvp
+        run: flutter pub get
+
+      - name: Analyze project
+        working-directory: app/world_live_chat_mvp
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Build APK
+        working-directory: app/world_live_chat_mvp
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEON-WORLD-Android
+          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
