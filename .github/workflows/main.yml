@@ -1,10 +1,13 @@
-name: Build NEON WORLD APK
+name: Build NEON BET Android APK
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - 'neon-bet-app/**'
+      - '.github/workflows/main.yml'
 
 jobs:
   build:
@@ -14,56 +17,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract NEON WORLD
-        run: |
-          rm -rf extracted
-          mkdir extracted
-          unzip -o unzip -o "NEON_WORLD_v0.5_FIXED2.zip" -d extracted -d extracted
-
-      - name: Find Flutter project
-        id: project
-        shell: bash
-        run: |
-          PROJECT_DIR="$(find extracted -type f -name pubspec.yaml -printf '%h\n' | head -n 1)"
-          if [ -z "$PROJECT_DIR" ]; then
-            echo "ERROR: pubspec.yaml not found"
-            find extracted -maxdepth 4 -type f | head -n 200
-            exit 1
-          fi
-          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
-          echo "Flutter project: $PROJECT_DIR"
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - name: Create Android project files
-        working-directory: ${{ steps.project.outputs.dir }}
-        run: flutter create --platforms=android .
+      - name: Create Android platform files
+        working-directory: neon-bet-app
+        run: flutter create --platforms=android --org com.neonbet .
 
-      - name: Add Android Internet permission
-        working-directory: ${{ steps.project.outputs.dir }}
+      - name: Set app name and Internet permission
+        working-directory: neon-bet-app
         shell: bash
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
-          if ! grep -q "android.permission.INTERNET" "$MANIFEST"; then
-            sed -i '/<manifest/a\    <uses-permission android:name="android.permission.INTERNET"/>' "$MANIFEST"
+          sed -i 's/android:label="[^"]*"/android:label="NEON BET"/' "$MANIFEST"
+          if ! grep -q 'android.permission.INTERNET' "$MANIFEST"; then
+            sed -i '/<manifest/a\    <uses-permission android:name="android.permission.INTERNET" />' "$MANIFEST"
           fi
           cat "$MANIFEST"
 
-      - name: Flutter dependencies
-        working-directory: ${{ steps.project.outputs.dir }}
+      - name: Install dependencies
+        working-directory: neon-bet-app
         run: flutter pub get
 
-      - name: Build APK
-        working-directory: ${{ steps.project.outputs.dir }}
+      - name: Build release APK
+        working-directory: neon-bet-app
         run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEON-WORLD-APK
-          path: ${{ steps.project.outputs.dir }}/build/app/outputs/flutter-apk/app-release.apk
+          name: NEON-BET-Android-APK
+          path: neon-bet-app/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
