@@ -1,0 +1,18 @@
+name: world_live_chat_mvp
+description: Global random 1:1 live video chat MVP
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  livekit_client: ^2.11.0
+  supabase_flutter: ^2.17.2
+  http: ^1.2.2
+
+flutter:
+  uses-material-design: true
