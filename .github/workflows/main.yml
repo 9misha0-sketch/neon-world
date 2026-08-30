@@ -16,10 +16,21 @@ jobs:
 
       - name: Extract NEON WORLD
         run: |
-          rm -rf app
-          mkdir app
-          unzip -o NEON_WORLD_v0.5_connected.zip -d app
-          test -f app/world_live_chat_mvp/pubspec.yaml
+          rm -rf extracted
+          mkdir extracted
+          unzip -o "NEON_WORLD_v0.5_FIXED.zip" -d extracted
+          echo "ZIP extracted"
+          find extracted -maxdepth 3 -type f | head -50
+
+      - name: Find Flutter project
+        run: |
+          PROJECT_DIR=$(find extracted -name pubspec.yaml -printf '%h\n' | head -1)
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "Flutter project not found"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Flutter project found at: $PROJECT_DIR"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,98 +44,20 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Fix Flutter code
+      - name: Create Android project files
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          flutter create --platforms=android --org com.neonworld .
+
+      - name: Add Android permissions
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          root = Path("app/world_live_chat_mvp")
-
-          # Fix LiveKit service null safety
-          p = root / "lib/services/livekit_service.dart"
+          p = Path("android/app/src/main/AndroidManifest.xml")
           s = p.read_text()
 
-          s = s.replace(
-              "r.localParticipant.setCameraEnabled(",
-              "r.localParticipant?.setCameraEnabled("
-          )
-
-          s = s.replace(
-              "r.localParticipant.setMicrophoneEnabled(",
-              "r.localParticipant?.setMicrophoneEnabled("
-          )
-
-          s = s.replace(
-              "room?.localParticipant.setCameraEnabled(",
-              "room?.localParticipant?.setCameraEnabled("
-          )
-
-          s = s.replace(
-              "room?.localParticipant.setMicrophoneEnabled(",
-              "room?.localParticipant?.setMicrophoneEnabled("
-          )
-
-          p.write_text(s)
-
-          # Fix nullable profile map in home_screen.dart
-          p = root / "lib/screens/home_screen.dart"
-          s = p.read_text()
-
-          s = s.replace("p[", "p?[")
-
-          p.write_text(s)
-
-          # Fix nullable LiveKit localParticipant in video screen
-          p = root / "lib/screens/video_chat_screen.dart"
-          s = p.read_text()
-
-          s = s.replace(
-              "r.localParticipant.videoTrackPublications",
-              "r.localParticipant!.videoTrackPublications"
-          )
-
-          p.write_text(s)
-
-          print("Automatic fixes completed")
-          PY
-
-      - name: Create Android platform
-        working-directory: app/world_live_chat_mvp
-        run: |
-          if [ ! -d android ]; then
-            flutter create --platforms=android --org com.neonworld .
-          fi
-
-      - name: Install dependencies
-        working-directory: app/world_live_chat_mvp
-        run: flutter pub get
-
-      - name: Analyze
-        working-directory: app/world_live_chat_mvp
-        run: flutter analyze
-        continue-on-error: true
-
-      - name: Build APK
-        working-directory: app/world_live_chat_mvp
-        run: flutter build apk --release
-
-      - name: Verify APK
-        run: |
-          test -f app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: NEON-WORLD-Android-Fixed
-          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
-      - name: Build APK
-        working-directory: app/world_live_chat_mvp
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: NEON-WORLD-Android-Fixed
-          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+          permissions = '''<uses-permission android:name="android.permission.INTERNET"/>
+          <uses-permission android:name="android.permission.CAMERA"/>
+          <uses
