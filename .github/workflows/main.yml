@@ -33,33 +33,59 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Fix LiveKit null safety
+      - name: Fix Flutter code
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          p = Path("app/world_live_chat_mvp/lib/services/livekit_service.dart")
+          root = Path("app/world_live_chat_mvp")
+
+          # Fix LiveKit service null safety
+          p = root / "lib/services/livekit_service.dart"
           s = p.read_text()
 
           s = s.replace(
               "r.localParticipant.setCameraEnabled(",
               "r.localParticipant?.setCameraEnabled("
           )
+
           s = s.replace(
               "r.localParticipant.setMicrophoneEnabled(",
               "r.localParticipant?.setMicrophoneEnabled("
           )
+
           s = s.replace(
               "room?.localParticipant.setCameraEnabled(",
               "room?.localParticipant?.setCameraEnabled("
           )
+
           s = s.replace(
               "room?.localParticipant.setMicrophoneEnabled(",
               "room?.localParticipant?.setMicrophoneEnabled("
           )
 
           p.write_text(s)
-          print(p.read_text())
+
+          # Fix nullable profile map in home_screen.dart
+          p = root / "lib/screens/home_screen.dart"
+          s = p.read_text()
+
+          s = s.replace("p[", "p?[")
+
+          p.write_text(s)
+
+          # Fix nullable LiveKit localParticipant in video screen
+          p = root / "lib/screens/video_chat_screen.dart"
+          s = p.read_text()
+
+          s = s.replace(
+              "r.localParticipant.videoTrackPublications",
+              "r.localParticipant!.videoTrackPublications"
+          )
+
+          p.write_text(s)
+
+          print("Automatic fixes completed")
           PY
 
       - name: Create Android platform
@@ -78,6 +104,20 @@ jobs:
         run: flutter analyze
         continue-on-error: true
 
+      - name: Build APK
+        working-directory: app/world_live_chat_mvp
+        run: flutter build apk --release
+
+      - name: Verify APK
+        run: |
+          test -f app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEON-WORLD-Android-Fixed
+          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
       - name: Build APK
         working-directory: app/world_live_chat_mvp
         run: flutter build apk --release
