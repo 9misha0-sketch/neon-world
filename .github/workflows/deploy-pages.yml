@@ -1,9 +1,12 @@
-name: Deploy NEON WORLD to GitHub Pages
+name: Deploy NEON BET to GitHub Pages
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'neon-bet/**'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -30,15 +33,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Extract NEON WORLD
-        run: |
-          mkdir -p site
-          unzip -q NEON_WORLD_v0.5_connected.zip -d site
-
-      - name: Upload Pages
+      - name: Upload NEON BET site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: neon-bet
 
       - name: Deploy
         id: deployment
