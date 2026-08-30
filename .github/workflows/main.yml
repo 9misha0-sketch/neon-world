@@ -1,54 +1,42 @@
-name: Build NEON WORLD APK
+import 'package:livekit_client/livekit_client.dart';
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+class LiveKitService {
+  Room? room;
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  Future<Room> connect({
+    required String url,
+    required String token,
+  }) async {
+    await disconnect();
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    final r = Room();
 
-      - name: Extract NEON WORLD
-        run: |
-          mkdir app
-          unzip NEON_WORLD_v0.5_connected.zip -d app
-          echo "Project contents:"
-          find app -maxdepth 3 -type f | head -100
+    await r.connect(url, token);
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
+    await r.localParticipant?.setCameraEnabled(true);
+    await r.localParticipant?.setMicrophoneEnabled(true);
 
-      - name: Create Android platform
-        working-directory: app/world_live_chat_mvp
-        run: |
-          if [ ! -d "android" ]; then
-            flutter create --platforms=android .
-          fi
+    room = r;
 
-      - name: Install dependencies
-        working-directory: app/world_live_chat_mvp
-        run: flutter pub get
+    return r;
+  }
 
-      - name: Analyze project
-        working-directory: app/world_live_chat_mvp
-        run: flutter analyze
-        continue-on-error: true
+  Future<void> setMicEnabled(bool enabled) async {
+    await room?.localParticipant?.setMicrophoneEnabled(enabled);
+  }
 
-      - name: Build APK
-        working-directory: app/world_live_chat_mvp
-        run: flutter build apk --release
+  Future<void> setCameraEnabled(bool enabled) async {
+    await room?.localParticipant?.setCameraEnabled(enabled);
+  }
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: NEON-WORLD-Android
-          path: app/world_live_chat_mvp/build/app/outputs/flutter-apk/app-release.apk
+  Future<void> disconnect() async {
+    final r = room;
+
+    room = null;
+
+    if (r != null) {
+      await r.disconnect();
+      await r.dispose();
+    }
+  }
+}
