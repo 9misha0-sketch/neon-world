@@ -2,90 +2,26 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" content="#080b14">
 <title>NEON BET — Play Money</title>
 <style>
-:root{--bg:#080b14;--panel:#101522;--text:#f7f9ff;--muted:#9aa5ba;--purple:#8b5cf6;--cyan:#22d3ee;--green:#2ee59d}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 10%,#1e1b4b 0,transparent 28%),radial-gradient(circle at 85% 20%,#0f3a44 0,transparent 24%),var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 5vw;background:#080b14d9;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff0f}
-.brand{display:flex;gap:10px;align-items:center;color:#fff;text-decoration:none;font-weight:900}.brand b{color:var(--cyan)}
-.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--cyan))}
-.desktop-nav{display:flex;gap:28px}.desktop-nav a{color:#b7c1d4;text-decoration:none;font-weight:700}
-.top-actions{display:flex;gap:8px}.btn,.wallet,.chip{border:0;cursor:pointer;font-weight:800}.btn{padding:12px 17px;border-radius:12px}
-.primary{background:linear-gradient(135deg,var(--purple),#6d5dfc);color:#fff}.ghost,.wallet,.glass{background:#ffffff0b;color:#fff;border:1px solid #ffffff18}
-.wallet{padding:10px 14px;border-radius:12px}
-.hero{max-width:1200px;margin:auto;padding:72px 5vw 40px;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
-.eyebrow,.kicker{color:var(--cyan);font-size:12px;font-weight:900;letter-spacing:1.5px}
-.hero h1{font-size:clamp(44px,7vw,86px);line-height:.95;margin:14px 0 20px}.hero h1 span{background:linear-gradient(90deg,#fff,var(--cyan),#b794f4);-webkit-background-clip:text;color:transparent}
-.hero p{color:var(--muted);font-size:18px;line-height:1.7;max-width:680px}.hero-actions{display:flex;gap:12px;margin:26px 0}.xl{padding:16px 22px}
-.trust{display:flex;gap:18px;color:#aeb8cc;font-size:13px;flex-wrap:wrap}
-.hero-card{min-height:390px;border:1px solid #ffffff16;border-radius:28px;padding:34px;text-align:center;background:linear-gradient(180deg,#151b2bcc,#0d1220cc)}
-.jackpot-label{color:#f0c970;font-weight:900;letter-spacing:2px}.jackpot{font-size:42px;font-weight:900;margin:22px 0 4px}.jackpot-sub{color:var(--muted)}
-.mini-wheel{width:160px;height:160px;border-radius:50%;margin:28px auto 0;background:conic-gradient(var(--purple) 0 12.5%,var(--cyan) 0 25%,#f59e0b 0 37.5%,#ec4899 0 50%,var(--purple) 0 62.5%,var(--cyan) 0 75%,#f59e0b 0 87.5%,#ec4899 0);display:grid;place-items:center}
-.wheel-core{width:96px;height:96px;border-radius:50%;background:#0b101b;display:grid;place-items:center;font-size:48px;font-weight:900}
-.section{max-width:1200px;margin:auto;padding:52px 5vw}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end}.section h2{font-size:34px;margin:7px 0}
-.filters{display:flex;gap:8px;flex-wrap:wrap}.chip{padding:10px 14px;border-radius:99px;background:#ffffff0a;color:#aeb8cc;border:1px solid #ffffff12}.chip.active{background:#fff;color:#0a0d14}
-.games-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:24px}.game{min-height:240px;border-radius:22px;padding:20px;position:relative;background:linear-gradient(160deg,#222a40,#101522);border:1px solid #ffffff12}
-.game .art{height:135px;border-radius:16px;display:grid;place-items:center;font-size:58px;background:radial-gradient(circle,#ffffff18,transparent 68%)}.game small{color:var(--muted)}
-.game button{position:absolute;left:16px;bottom:16px;width:42px;height:42px;border:0;border-radius:50%;background:var(--green);cursor:pointer}
-.promo-row{max-width:1100px;margin:10px auto;display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:0 5vw}.promo{border-radius:24px;padding:30px}.purple{background:linear-gradient(135deg,#5624b5,#8b5cf6)}.cyan{background:linear-gradient(135deg,#075d6b,#0e98ad)}
-.vip{padding:30px;border:1px solid #ffffff12;border-radius:24px;background:#0f1421;display:grid;grid-template-columns:1fr 1fr;gap:40px}
-.mobile-nav{display:none}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,30px);background:#111827;border:1px solid #ffffff1f;color:#fff;padding:12px 16px;border-radius:12px;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
-dialog{border:1px solid #ffffff18;border-radius:24px;background:#0e1320;color:white;padding:30px;width:min(92vw,430px)}dialog::backdrop{background:#02040bbb}dialog input{width:100%;padding:14px;border-radius:12px;border:1px solid #ffffff15;background:#ffffff0a;color:white;margin:7px 0}
-@media(max-width:850px){.desktop-nav,.top-actions .ghost{display:none}.hero{grid-template-columns:1fr}.games-grid{grid-template-columns:repeat(2,1fr)}.promo-row,.vip{grid-template-columns:1fr}.mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:0;right:0;bottom:0;background:#090d17ee;padding:8px;z-index:50}.mobile-nav button{background:transparent;color:#7f8aa1;border:0;display:grid;place-items:center}.mobile-nav span{font-size:10px}body{padding-bottom:70px}}
+*{box-sizing:border-box}html,body{margin:0;padding:0;min-height:100%;background:#080b14;color:#fff;font-family:Arial,Helvetica,sans-serif}body{background:linear-gradient(180deg,#241653 0,#0b2330 26%,#080b14 55%);min-height:100vh}.wrap{width:min(1100px,92%);margin:0 auto}.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}.mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:grid;place-items:center}.coin{background:#141a28;border:1px solid #293246;border-radius:12px;padding:10px 12px;font-weight:800}.hero{padding:54px 0 34px}.tag{color:#22d3ee;font-size:12px;font-weight:900;letter-spacing:1.2px}.hero h1{font-size:48px;line-height:1.02;margin:12px 0 18px}.hero h1 span{color:#67e8f9}.hero p{color:#b7c1d4;line-height:1.7;font-size:17px}.actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}.btn{border:0;border-radius:13px;padding:14px 18px;font-weight:900;font-size:16px}.primary{background:linear-gradient(135deg,#8b5cf6,#5b5df8);color:#fff}.secondary{background:#151c2b;color:#fff;border:1px solid #2b3549}.jackpot{margin:24px 0;padding:24px;border-radius:22px;background:#111827;border:1px solid #283247;text-align:center}.jackpot small{color:#f0c970;font-weight:900}.jackpot strong{display:block;font-size:36px;margin:10px 0}.section{padding:28px 0}.section h2{font-size:30px;margin:0 0 18px}.games{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.game{background:#111827;border:1px solid #273044;border-radius:18px;padding:16px;min-height:160px}.game .icon{font-size:45px}.game h3{margin:12px 0 4px}.game small{color:#9ca8bd}.play{margin-top:12px;width:100%;background:#2ee59d;color:#06150f;border:0;border-radius:10px;padding:10px;font-weight:900}.banner{margin:28px 0;background:linear-gradient(135deg,#5a2eb9,#0e879b);padding:24px;border-radius:20px}.footer{padding:30px 0 90px;color:#94a3b8;font-size:13px}.bottom{position:fixed;left:0;right:0;bottom:0;background:#0c111dee;border-top:1px solid #253044;display:grid;grid-template-columns:repeat(4,1fr);padding:9px 6px}.bottom button{border:0;background:transparent;color:#b5bfd0;font-size:12px}.bottom b{display:block;font-size:20px;margin-bottom:3px}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#111827;border:1px solid #334155;padding:12px 16px;border-radius:12px;display:none;z-index:20}@media(min-width:800px){.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center}.hero h1{font-size:72px}.games{grid-template-columns:repeat(4,1fr)}.bottom{display:none}.footer{padding-bottom:30px}}
 </style>
 </head>
 <body>
-<header class="topbar">
-<a class="brand" href="#"><span class="brand-mark">N</span><span>NEON <b>BET</b></span></a>
-<nav class="desktop-nav"><a href="#games">משחקים</a><a href="#rewards">בונוסים</a><a href="#vip">VIP</a></nav>
-<div class="top-actions"><button class="wallet">🪙 <span id="balance">25,000</span></button><button class="btn ghost" id="loginBtn">כניסה</button><button class="btn primary" id="joinBtn">הרשמה</button></div>
-</header>
-
-<main>
-<section class="hero">
-<div>
-<div class="eyebrow">SOCIAL CASINO • PLAY MONEY ONLY</div>
-<h1>הדור הבא של<br><span>משחקי הקזינו</span></h1>
-<p>חוויה מהירה ומתקדמת עם מטבעות וירטואליים בלבד — ללא הפקדות, ללא משיכות וללא הימורים בכסף אמיתי.</p>
-<div class="hero-actions"><button class="btn primary xl" id="playNow">שחק עכשיו</button><button class="btn glass xl" id="dailyBonus">🎁 בונוס יומי</button></div>
-<div class="trust"><span>⚡ משחק מיידי</span><span>🔒 חשבון מאובטח</span><span>🎮 Play Money</span></div>
+<div class="wrap">
+<header class="top"><div class="logo"><span class="mark">N</span><span>NEON <span style="color:#22d3ee">BET</span></span></div><div class="coin">🪙 <span id="balance">25,000</span></div></header>
+<section class="hero"><div><div class="tag">SOCIAL CASINO • PLAY MONEY ONLY</div><h1>הדור הבא של<br><span>משחקי הקזינו</span></h1><p>חוויה מהירה עם מטבעות וירטואליים בלבד. ללא הפקדות, ללא משיכות וללא הימורים בכסף אמיתי.</p><div class="actions"><button class="btn primary" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">שחק עכשיו</button><button class="btn secondary" onclick="dailyBonus()">🎁 בונוס יומי</button></div></div><div class="jackpot"><small>NEON JACKPOT</small><strong id="jackpot">8,472,190</strong><span>מטבעות וירטואליים</span></div></section>
+<section class="section" id="games"><h2>משחקים מובילים</h2><div class="games" id="gamesGrid"></div></section>
+<div class="banner"><b>WELCOME DROP</b><h2>50,000 מטבעות לשחקנים חדשים</h2><p>גרסת Play Money בלבד.</p></div>
+<div class="footer">NEON BET • Social Casino Demo • Play Money Only</div>
 </div>
-<div class="hero-card"><div class="jackpot-label">NEON JACKPOT</div><div class="jackpot" id="jackpot">8,472,190</div><div class="jackpot-sub">מטבעות וירטואליים</div><div class="mini-wheel"><div class="wheel-core">N</div></div></div>
-</section>
-
-<section class="section" id="games">
-<div class="section-head"><div><span class="kicker">הכי חם עכשיו</span><h2>משחקים מובילים</h2></div><div class="filters"><button class="chip active">הכול</button><button class="chip">סלוטים</button><button class="chip">שולחן</button><button class="chip">חדש</button></div></div>
-<div class="games-grid" id="gamesGrid"></div>
-</section>
-
-<section class="promo-row" id="rewards">
-<article class="promo purple"><span>WELCOME DROP</span><h3>50,000 מטבעות<br>לשחקנים חדשים</h3><button class="btn" id="claimWelcome">קבל בונוס</button></article>
-<article class="promo cyan"><span>DAILY STREAK</span><h3>חזור כל יום<br>והגדל את הפרס</h3></article>
-</section>
-
-<section class="section" id="vip"><div class="vip"><div><span class="kicker">NEON CLUB</span><h2>מסלול VIP</h2><p>צוברים XP ממשחקים, עולים דרגות ופותחים הטבות קוסמטיות ובונוסי Play Money.</p></div><div><b>GOLD III</b><p>7,420 / 10,000 XP</p></div></div></section>
-</main>
-
-<nav class="mobile-nav"><button>⌂<span>בית</span></button><button>◈<span>משחקים</span></button><button id="mobileBonus">🎁<span>בונוס</span></button><button>♛<span>VIP</span></button><button id="profileBtn">●<span>פרופיל</span></button></nav>
-
-<dialog id="authDialog"><h2>ברוכים הבאים</h2><p>פתח חשבון Play Money וקבל 50,000 מטבעות וירטואליים.</p><input id="nickname" placeholder="כינוי"><input id="email" type="email" placeholder="אימייל"><button class="btn primary" id="createAccount">צור חשבון</button></dialog>
+<nav class="bottom"><button onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b>בית</button><button onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})"><b>◈</b>משחקים</button><button onclick="dailyBonus()"><b>🎁</b>בונוס</button><button onclick="showToast('פרופיל יתווסף בגרסה הבאה')"><b>●</b>פרופיל</button></nav>
 <div class="toast" id="toast"></div>
-
 <script>
-const games=[['Royal Spin','סלוטים','👑'],['Neon Roulette','שולחן','🎯'],['Diamond Rush','סלוטים','💎'],['Blackjack 21','שולחן','🂡'],['Cyber Fruits','חדש','🍒'],['Lucky Sevens','סלוטים','777'],['Neon Poker','שולחן','♠️'],['Moon Vault','חדש','🌙']];
-const grid=document.getElementById('gamesGrid');
-games.forEach(g=>{const c=document.createElement('article');c.className='game';c.dataset.type=g[1];c.innerHTML=`<div class="art">${g[2]}</div><h3>${g[0]}</h3><small>${g[1]} • Play Money</small><button>▶</button>`;c.querySelector('button').onclick=()=>play(g[0]);grid.appendChild(c)});
-let balance=Number(localStorage.getItem('neonBalance')||25000);const bal=document.getElementById('balance');function render(){bal.textContent=balance.toLocaleString('en-US');localStorage.setItem('neonBalance',balance)}render();
-function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2200)}
-function play(name){if(balance<100){toast('אין מספיק מטבעות וירטואליים');return}balance-=100;const win=Math.random()<.46?Math.floor(Math.random()*900):0;if(win)balance+=win;render();toast(win?`${name}: זכית ${win} 🪙`:`${name}: נסה שוב`)}
-const dlg=document.getElementById('authDialog');['loginBtn','joinBtn','profileBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>dlg.showModal()));
-document.getElementById('createAccount').onclick=()=>{const n=document.getElementById('nickname').value.trim();const e=document.getElementById('email').value.trim();if(!n||!e.includes('@')){toast('מלא כינוי ואימייל תקין');return}localStorage.setItem('neonUser',JSON.stringify({nickname:n,email:e}));balance+=50000;render();dlg.close();toast(`ברוך הבא ${n}! קיבלת 50,000 🪙`)};
-function daily(){const today=new Date().toDateString();if(localStorage.getItem('neonDaily')===today){toast('כבר אספת את הבונוס היומי');return}localStorage.setItem('neonDaily',today);balance+=2500;render();toast('קיבלת 2,500 מטבעות 🪙')}
-document.getElementById('dailyBonus').onclick=daily;document.getElementById('mobileBonus').onclick=daily;document.getElementById('claimWelcome').onclick=()=>dlg.showModal();document.getElementById('playNow').onclick=()=>document.getElementById('games').scrollIntoView({behavior:'smooth'});
-document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));ch.classList.add('active');const f=ch.textContent;document.querySelectorAll('.game').forEach(c=>c.style.display=f==='הכול'||c.dataset.type===f?'block':'none')});
-let jackpot=8472190;setInterval(()=>{jackpot+=Math.floor(Math.random()*7);document.getElementById('jackpot').textContent=jackpot.toLocaleString('en-US')},1600);
+var games=[['Royal Spin','👑'],['Neon Roulette','🎯'],['Diamond Rush','💎'],['Blackjack 21','🂡'],['Cyber Fruits','🍒'],['Lucky Sevens','777'],['Neon Poker','♠️'],['Moon Vault','🌙']];
+var balance=parseInt(localStorage.getItem('neonBalance')||'25000',10);var bal=document.getElementById('balance');function render(){bal.textContent=balance.toLocaleString();localStorage.setItem('neonBalance',String(balance))}function showToast(t){var x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(function(){x.style.display='none'},1800)}function play(n){if(balance<100){showToast('אין מספיק מטבעות');return}balance-=100;var win=Math.random()<0.46?Math.floor(Math.random()*900):0;if(win){balance+=win}render();showToast(win?n+': זכית '+win+' 🪙':n+': נסה שוב')}function dailyBonus(){var d=new Date().toDateString();if(localStorage.getItem('neonDaily')===d){showToast('כבר אספת את הבונוס היומי');return}localStorage.setItem('neonDaily',d);balance+=2500;render();showToast('קיבלת 2,500 מטבעות 🪙')}var grid=document.getElementById('gamesGrid');games.forEach(function(g){var c=document.createElement('div');c.className='game';c.innerHTML='<div class="icon">'+g[1]+'</div><h3>'+g[0]+'</h3><small>Play Money</small><button class="play">שחק</button>';c.querySelector('button').onclick=function(){play(g[0])};grid.appendChild(c)});render();var jp=8472190;setInterval(function(){jp+=Math.floor(Math.random()*6);document.getElementById('jackpot').textContent=jp.toLocaleString()},1700);
 </script>
 </body>
 </html>
