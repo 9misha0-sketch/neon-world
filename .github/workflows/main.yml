@@ -27,7 +27,7 @@ jobs:
         working-directory: neon-bet-app
         run: flutter create --platforms=android --org com.neonbet .
 
-      - name: Set app permissions
+      - name: Set app permissions and SDK
         working-directory: neon-bet-app
         shell: bash
         run: |
@@ -38,16 +38,39 @@ jobs:
               sed -i "/<manifest/a\\    <uses-permission android:name=\"android.permission.$PERM\" />" "$MANIFEST"
             fi
           done
+          sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' android/app/build.gradle.kts || true
+          sed -i 's/targetSdk = flutter.targetSdkVersion/targetSdk = 36/' android/app/build.gradle.kts || true
           cat "$MANIFEST"
+          cat android/app/build.gradle.kts
 
       - name: Install dependencies
         working-directory: neon-bet-app
         run: flutter pub get
 
+      - name: Patch flutter_webrtc compileSdk
+        working-directory: neon-bet-app
+        shell: bash
+        run: |
+          WEBRTC_DIR=$(find "$PUB_CACHE/hosted/pub.dev" -maxdepth 1 -type d -name 'flutter_webrtc-*' | sort | tail -n 1)
+          echo "Using WebRTC plugin at: $WEBRTC_DIR"
+          if [ -f "$WEBRTC_DIR/android/build.gradle" ]; then
+            sed -i -E 's/compileSdkVersion[[:space:]]+[0-9]+/compileSdkVersion 36/g' "$WEBRTC_DIR/android/build.gradle"
+            sed -i -E 's/compileSdkVersion[[:space:]]+android\.compileSdkVersion/compileSdkVersion 36/g' "$WEBRTC_DIR/android/build.gradle" || true
+            cat "$WEBRTC_DIR/android/build.gradle"
+          fi
+          if [ -f "$WEBRTC_DIR/android/build.gradle.kts" ]; then
+            sed -i -E 's/compileSdk[[:space:]]*=[[:space:]]*[0-9]+/compileSdk = 36/g' "$WEBRTC_DIR/android/build.gradle.kts"
+            cat "$WEBRTC_DIR/android/build.gradle.kts"
+          fi
+
       - name: Analyze diagnostics
         working-directory: neon-bet-app
         continue-on-error: true
         run: flutter analyze lib/app_v32.dart lib/video_chat.dart lib/main.dart
+
+      - name: Clean Gradle build
+        working-directory: neon-bet-app
+        run: flutter clean && flutter pub get
 
       - name: Build release APK
         working-directory: neon-bet-app
